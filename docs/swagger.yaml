@@ -1,0 +1,58 @@
+info:
+  contact: {}
+paths:
+  /v1/file:
+    get:
+      consumes:
+      - application/json
+      description: Mendapatkan List Files
+      parameters:
+      - description: search (string)
+        in: query
+        name: search
+        type: string
+      - description: page (int)
+        in: query
+        name: page
+        type: integer
+      - description: limit (int)
+        in: query
+        name: limit
+        type: integer
+      - description: token (string)
+        in: query
+        name: token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - JwtToken: []
+      summary: Mendapatkan List Files
+      tags:
+      - File
+    post:
+      consumes:
+      - multipart/form-data
+      description: File Uploader
+      parameters:
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      - JwtToken: []
+      summary: File Uploader
+      tags:
+      - File
+swagger: "2.0"

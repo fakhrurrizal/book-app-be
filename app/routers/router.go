@@ -3,15 +3,38 @@ package router
 import (
 	"book-app/app/controllers"
 	"book-app/app/middlewares"
+	"book-app/config"
+	"fmt"
+	"html/template"
+	"io"
 	"log"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 func Init(app *echo.Echo) {
-
+	renderer := &TemplateRenderer{
+		templates: template.Must(template.ParseGlob("*.html")),
+	}
+	app.Renderer = renderer
 	app.Use(middlewares.Cors())
 	app.Use(middlewares.Secure())
+	app.Use(middlewares.Gzip())
+
+	app.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	app.GET("/api-docs", func(c echo.Context) error {
+		err := c.Render(http.StatusOK, "docs.html", map[string]interface{}{
+			"BaseUrl": config.LoadConfig().BaseUrl,
+			"Title":   "Dokumentasi API " + config.LoadConfig().AppName,
+		})
+		if err != nil {
+			fmt.Println("Error rendering docs.html:", err)
+		}
+		return err
+	})
 
 	app.GET("/", controllers.Index)
 
@@ -43,4 +66,17 @@ func Init(app *echo.Echo) {
 	}
 
 	log.Printf("Server started...")
+}
+
+type TemplateRenderer struct {
+	templates *template.Template
+}
+
+func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+
+	if viewContext, isMap := data.(map[string]interface{}); isMap {
+		viewContext["reverse"] = c.Echo().Reverse
+	}
+
+	return t.templates.ExecuteTemplate(w, name, data)
 }

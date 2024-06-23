@@ -1,3 +1,3 @@
-### Selamat Datang Guys ###
+### Selamat Datang Guys
 
-Book Lovers App BE
+Book App BE

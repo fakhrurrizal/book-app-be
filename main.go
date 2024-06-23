@@ -10,7 +10,6 @@ import (
 	"gopkg.in/tylerb/graceful.v1"
 )
 
-
 func main() {
 	app := echo.New()
 
