@@ -1,0 +1,18 @@
+
+
+
+# Log files
+*.log
+
+# Node artifact files
+.env
+/assets/uploads/*
+
+# Large media files
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
+.env
