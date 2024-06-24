@@ -1,4 +1,4 @@
-package handler
+package main
 
 import (
 	router "book-app/app/routers"
@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
 	"gopkg.in/tylerb/graceful.v1"
 )
