@@ -10,6 +10,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// CreateBook godoc
+// @Summary Create Book
+// @Description Create New Book
+// @Tags Book
+// @Produce json
+// @Param Body body reqres.BookRequest true "Create body"
+// @Success 200
+// @Router /v1/book [post]
 func CreateBook(c echo.Context) error {
 	var input reqres.BookRequest
 	if err := c.Bind(&input); err != nil {
@@ -35,6 +43,20 @@ func CreateBook(c echo.Context) error {
 	})
 }
 
+// GetBookData godoc
+// @Summary Get Book with Pagination
+// @Description Get Book with Pagination
+// @Tags Book
+// @Param search query string false "search (string)"
+// @Param page query integer false "page (int)"
+// @Param limit query integer false "limit (int)"
+// @Param sort query integer false "sort (id or publication_year)"
+// @Param order query integer false "order (asc or desc)"
+// @Param status query integer false "status (status)"
+// @Param category_id query integer false "category_id (int)"
+// @Produce json
+// @Success 200
+// @Router /v1/book [get]
 func GetBooks(c echo.Context) error {
 	categoryID, _ := strconv.Atoi(c.QueryParam("category_id"))
 	param := utils.PopulatePaging(c, "status")
@@ -44,6 +66,14 @@ func GetBooks(c echo.Context) error {
 	return c.JSON(http.StatusOK, data)
 }
 
+// GetBookId godoc
+// @Summary Get Single Book
+// @Description Get Single Book
+// @Tags Book
+// @Param any path string true "id"
+// @Produce json
+// @Success 200
+// @Router /v1/book/{id} [get]
 func GetBookByID(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
@@ -59,6 +89,14 @@ func GetBookByID(c echo.Context) error {
 	})
 }
 
+// DeleteBookId godoc
+// @Summary Delete Single Book by ID
+// @Description Delete Single Book by ID
+// @Tags Book
+// @Produce json
+// @Param id path integer true "id"
+// @Success 200
+// @Router /v1/book/{id} [delete]
 func DeleteBookByID(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
@@ -80,6 +118,15 @@ func DeleteBookByID(c echo.Context) error {
 
 }
 
+// UpdateBookById godoc
+// @Summary Update Single Book by ID
+// @Description Update Single Book by ID
+// @Tags Book
+// @Produce json
+// @Param id path integer true "id"
+// @Param Body body reqres.BookRequest true "Update body"
+// @Success 200
+// @Router /v1/book/{id} [put]
 func UpdateBookByID(c echo.Context) error {
 	var input reqres.BookRequest
 

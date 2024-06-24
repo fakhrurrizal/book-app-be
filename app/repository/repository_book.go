@@ -5,7 +5,6 @@ import (
 	"book-app/app/reqres"
 	"book-app/app/utils"
 	"book-app/config"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -138,8 +137,6 @@ func GetBooks(categoryID int, param reqres.ReqPaging) (data reqres.ResPaging) {
 	}
 	pagedResponses := filteredResponses[startIndex:endIndex]
 
-	fmt.Print("param", param)
-
 	data = utils.PopulateResPaging(&param, pagedResponses, totalResult, totalFiltered)
 
 	return data
@@ -168,7 +165,7 @@ func sortBooks(books *[]reqres.BookResponse, sortField string, sortOrder string)
 	}
 }
 
-func GetAllBooksPlain(search string, categoryID int) (responses []models.Book, err error){
+func GetAllBooksPlain(search string, categoryID int) (responses []models.Book, err error) {
 	where := "deleted_at IS NULL AND status = true"
 
 	if search != "" {

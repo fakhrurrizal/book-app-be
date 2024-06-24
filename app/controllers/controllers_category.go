@@ -10,6 +10,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// CreateBookCategory godoc
+// @Summary Create Book Category
+// @Description Create New Book Category
+// @Tags BookCategory
+// @Produce json
+// @Param Body body reqres.BookCategoryRequest true "Create body"
+// @Success 200
+// @Router /v1/book-category [post]
 func CreateBookCategory(c echo.Context) error {
 	var input reqres.BookCategoryRequest
 
@@ -37,6 +45,17 @@ func CreateBookCategory(c echo.Context) error {
 	})
 }
 
+// GetCategoryBookData godoc
+// @Summary Get Category Book  with Pagination
+// @Description Get category Book with Pagination
+// @Tags BookCategory
+// @Param search query string false "search (string)"
+// @Param page query integer false "page (int)"
+// @Param limit query integer false "limit (int)"
+// @Param status query integer false "status (status)"
+// @Produce json
+// @Success 200
+// @Router /v1/book-category [get]
 func GetBookCategories(c echo.Context) error {
 
 	param := utils.PopulatePaging(c, "status")
@@ -44,6 +63,15 @@ func GetBookCategories(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, data)
 }
+
+// GetBookCategoryId godoc
+// @Summary Get Single Book Category
+// @Description Get Single Book Category
+// @Tags BookCategory
+// @Param any path string true "id"
+// @Produce json
+// @Success 200
+// @Router /v1/book-category/{id} [get]
 
 func GetBookCategoryByID(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
@@ -58,6 +86,14 @@ func GetBookCategoryByID(c echo.Context) error {
 	})
 }
 
+// DeleteBookCategoryId godoc
+// @Summary Delete Single Book Category by ID
+// @Description Delete Single Book Category by ID
+// @Tags BookCategory
+// @Produce json
+// @Param id path integer true "id"
+// @Success 200
+// @Router /v1/book-category/{id} [delete]
 func DeleteBookCategoryByID(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
@@ -89,6 +125,15 @@ func DeleteBookCategoryByID(c echo.Context) error {
 	})
 }
 
+// UpdateBookCategoryById godoc
+// @Summary Update Single Book Category by ID
+// @Description Update Single Book Category by ID
+// @Tags BookCategory
+// @Produce json
+// @Param id path integer true "id"
+// @Param Body body reqres.BookCategoryRequest true "Update body"
+// @Success 200
+// @Router /v1/book-category/{id} [put]
 func UpdateBookCategoryByID(c echo.Context) error {
 	var input reqres.BookCategoryRequest
 	if err := c.Bind(&input); err != nil {

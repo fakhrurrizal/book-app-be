@@ -4,6 +4,7 @@ import (
 	"book-app/app/controllers"
 	"book-app/app/middlewares"
 	"book-app/config"
+	_ "book-app/docs"
 	"fmt"
 	"html/template"
 	"io"

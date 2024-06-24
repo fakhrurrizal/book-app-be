@@ -39,7 +39,7 @@ func UploadFile(c echo.Context) error {
 		// 	"error":   err.Error(),
 		// })
 	}
-	
+
 	// Define the accepted MIME types
 	acceptedTypes := []string{
 		"image/png",
@@ -118,7 +118,7 @@ func UploadFile(c echo.Context) error {
 	// Create a destination file
 	t := time.Now().In(location)
 	time := t.Format("2006-01")
-	folder :=  time
+	folder := time
 	err = os.MkdirAll(config.RootPath()+"/assets/uploads/"+folder, os.ModePerm)
 	if err != nil {
 		return err
@@ -140,7 +140,7 @@ func UploadFile(c echo.Context) error {
 		return err
 	}
 
-	data, err := SaveFileToDatabase( folder+"/"+timestamp+extension, filePath)
+	data, err := SaveFileToDatabase(folder+"/"+timestamp+extension, filePath)
 	if err != nil {
 		return c.JSON(utils.ParseHttpError(err))
 	}
@@ -183,8 +183,7 @@ func SaveFileToDatabase(filename, path string) (data models.GlobalFile, err erro
 // @Produce json
 // @Success 200
 // @Router /v1/file [get]
-// @Security ApiKeyAuth
-// @Security JwtToken
+
 func GetFile(c echo.Context) error {
 	userID := c.Get("user_id").(int)
 
@@ -198,18 +197,10 @@ func GetFile(c echo.Context) error {
 }
 
 func GetFileControl(id int, param reqres.ReqPaging) (data reqres.ResPaging, err error) {
-	// key := fmt.Sprintf("UCGetFiles%v_%v_%v_%v_%v", param.Order, param.Search, param.Page, id, param.Offset)
-	// outputCached, _ := config.RC.Get(key).Result()
-	// if err = json.Unmarshal([]byte(outputCached), &data); err == nil {
-	// 	return
-	// }
+
 	data, err = repository.GetFile(id, param)
 	if err != nil {
 		return
 	}
-	// json, err := json.Marshal(&data)
-	// if err == nil {
-	// 	config.RC.Set(key, json, 30*time.Second).Err()
-	// }
 	return
 }

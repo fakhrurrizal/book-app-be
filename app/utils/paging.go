@@ -27,16 +27,17 @@ func PopulatePaging(c echo.Context, custom string) (param reqres.ReqPaging) {
 	if draw == 0 {
 		draw = 1
 	}
-	order := c.QueryParam("sort")
+	order := c.QueryParam("order")
 	if strings.ToLower(order) == "asc" {
 		order = "ASC"
 	} else {
 		order = "DESC"
 	}
-	sort := c.QueryParam("order")
+	sort := c.QueryParam("sort")
 	if sort == "" {
 		sort = "id"
 	}
+
 	param = reqres.ReqPaging{
 		Search: c.QueryParam("search"),
 		Order:  order,
