@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	router "book-app/app/routers"
@@ -10,7 +10,7 @@ import (
 	"gopkg.in/tylerb/graceful.v1"
 )
 
-func main() {
+func Main() {
 	app := echo.New()
 
 	config.Database()
