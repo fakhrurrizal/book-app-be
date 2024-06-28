@@ -42,6 +42,7 @@ func BuildBookCategoryResponse(data models.BookCategory) (response reqres.BookCa
 	response.Name = data.Name
 	response.Description = data.Description
 	response.Status = data.Status
+	response.Icon = data.Icon
 
 	return
 }

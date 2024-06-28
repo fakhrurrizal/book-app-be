@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 
+	echoSwagger "github.com/swaggo/echo-swagger"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,9 +22,9 @@ func Init(app *echo.Echo) {
 	app.Use(middlewares.Secure())
 	app.Use(middlewares.Gzip())
 
-	// app.GET("/swagger/*", echoSwagger.WrapHandler)
+	app.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	// app.GET("/api-docs", func(c echo.Context) error {
+	// app.GET("/docs", func(c echo.Context) error {
 	// 	err := c.Render(http.StatusOK, "docs.html", map[string]interface{}{
 	// 		"BaseUrl": config.LoadConfig().BaseUrl,
 	// 		"Title":   "Dokumentasi API " + config.LoadConfig().AppName,
