@@ -93,7 +93,6 @@ func UploadFile(c echo.Context) error {
 	if fileType == "text/csv" {
 		extension = ".csv"
 	}
-	// Check if the MIME type is accepted
 	var isAccepted bool
 	for _, t := range acceptedTypes {
 		if t == fileType {
@@ -108,14 +107,12 @@ func UploadFile(c echo.Context) error {
 		})
 	}
 
-	// Open the file
 	src, err := file.Open()
 	if err != nil {
 		return err
 	}
 	defer src.Close()
 
-	// Create a destination file
 	t := time.Now().In(location)
 	time := t.Format("2006-01")
 	folder := time
@@ -125,7 +122,6 @@ func UploadFile(c echo.Context) error {
 	}
 	timestamp := strconv.Itoa(int(t.Unix()))
 
-	// Rename the file to the timestamp with the original file extension
 	filePath := filepath.Join(config.RootPath()+"/assets/uploads/", folder, timestamp+extension)
 	fmt.Println(filePath)
 	dst, err := os.Create(filePath)
@@ -135,7 +131,6 @@ func UploadFile(c echo.Context) error {
 	}
 	defer dst.Close()
 
-	// Copy the file to the destination
 	if _, err = io.Copy(dst, src); err != nil {
 		return err
 	}
@@ -149,7 +144,7 @@ func UploadFile(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":  200,
 		"data":    data,
-		"message": "File uploaded successfully",
+		"message": "Upload File Berhasil",
 	})
 }
 
@@ -158,7 +153,6 @@ func SaveFileToDatabase(filename, path string) (data models.GlobalFile, err erro
 	if err != nil {
 		location = time.Local
 		err = nil
-		// fmt.Println("Failed to get Asia/Jakarta time when saving file to database. Error: ", err)
 	}
 	t := time.Now().In(location).Unix()
 	data = models.GlobalFile{

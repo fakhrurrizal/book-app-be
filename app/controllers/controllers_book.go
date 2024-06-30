@@ -50,7 +50,7 @@ func CreateBook(c echo.Context) error {
 // @Param search query string false "search (string)"
 // @Param page query integer false "page (int)"
 // @Param limit query integer false "limit (int)"
-// @Param sort query integer false "sort (id or publication_year)"
+// @Param sort query integer false "sort (id or publication_year or title)"
 // @Param order query integer false "order (asc or desc)"
 // @Param status query integer false "status (status)"
 // @Param category_id query integer false "category_id (int)"
@@ -70,7 +70,7 @@ func GetBooks(c echo.Context) error {
 // @Summary Get Single Book
 // @Description Get Single Book
 // @Tags Book
-// @Param any path string true "id"
+// @Param id path string true "id"
 // @Produce json
 // @Success 200
 // @Router /v1/book/{id} [get]

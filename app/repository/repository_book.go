@@ -158,6 +158,13 @@ func sortBooks(books *[]reqres.BookResponse, sortField string, sortOrder string)
 			}
 			return a.PublicationYear > b.PublicationYear
 		})
+	case "title":
+		bubbleSort(books, func(a, b reqres.BookResponse) bool {
+			if sortOrder == "ASC" {
+				return strings.ToLower(a.Title) < strings.ToLower(b.Title)
+			}
+			return strings.ToLower(a.Title) > strings.ToLower(b.Title)
+		})
 	default:
 		bubbleSort(books, func(a, b reqres.BookResponse) bool {
 			return a.ID < b.ID

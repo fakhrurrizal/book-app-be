@@ -46,7 +46,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "sort (id or publication_year)",
+                        "description": "sort (id or publication_year or title)",
                         "name": "sort",
                         "in": "query"
                     },
@@ -244,7 +244,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "id",
-                        "name": "any",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }

@@ -16,6 +16,7 @@ func CreateBookCategory(data *reqres.BookCategoryRequest) (response models.BookC
 		Name:        data.Name,
 		Description: data.Description,
 		Status:      data.Status,
+		Icon:        data.Icon,
 	}
 
 	var created bool

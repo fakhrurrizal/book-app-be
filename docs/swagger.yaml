@@ -59,7 +59,7 @@ paths:
         in: query
         name: limit
         type: integer
-      - description: sort (id or publication_year)
+      - description: sort (id or publication_year or title)
         in: query
         name: sort
         type: integer
@@ -206,7 +206,7 @@ paths:
       parameters:
       - description: id
         in: path
-        name: any
+        name: id
         required: true
         type: string
       produces:
