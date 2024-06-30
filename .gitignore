@@ -1,11 +1,11 @@
 
 
+.env
 
 # Log files
 *.log
 
 # Node artifact files
-.env
 /assets/uploads/*
 
 # Large media files
@@ -15,4 +15,3 @@
 *.flv
 *.mov
 *.wmv
-.env
