@@ -49,7 +49,7 @@ type BookResponse struct {
 	Publisher       string               `json:"publisher"`
 	Image           string               `json:"image"`
 	PublicationYear int                  `json:"publication_year"`
-	Language        string               `json:"languange"`
+	Language        string               `json:"language"`
 	Description     string               `json:"description"`
 	NumberOfPages   int                  `json:"number_of_pages"`
 	Status          bool                 `json:"status"`
