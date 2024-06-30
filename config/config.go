@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -80,8 +81,20 @@ func LoadConfig() (config *Config) {
 
 func RootPath() string {
 	projectDirName := os.Getenv("DIR_NAME")
+	if projectDirName == "" {
+		log.Fatalf("Environment variable DIR_NAME is not set")
+	}
+
 	projectName := regexp.MustCompile(`^(.*` + projectDirName + `)`)
-	currentWorkDirectory, _ := os.Getwd()
+	currentWorkDirectory, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("Error getting current working directory: %v", err)
+	}
+
 	rootPath := projectName.Find([]byte(currentWorkDirectory))
+	if rootPath == nil {
+		log.Fatalf("Error finding project root path based on DIR_NAME: %v", projectDirName)
+	}
+
 	return string(rootPath)
 }
