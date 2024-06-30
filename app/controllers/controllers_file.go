@@ -140,7 +140,7 @@ func UploadFile(c echo.Context) error {
 		return c.JSON(utils.ParseHttpError(err))
 	}
 	data.FullUrl = config.LoadConfig().BaseUrl + "/assets/uploads/" + folder + "/" + timestamp + extension
-
+	fmt.Print("data", data)
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":  200,
 		"data":    data,

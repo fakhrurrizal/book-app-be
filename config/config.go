@@ -33,7 +33,7 @@ type Config struct {
 
 func LoadConfig() (config *Config) {
 
-	if err := godotenv.Load(RootPath() + `/.env`); err != nil {
+	if err := godotenv.Load(RootPath() + `/.env.local`); err != nil {
 		fmt.Println(err)
 	}
 
