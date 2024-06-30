@@ -21,6 +21,7 @@ func Init(app *echo.Echo) {
 	app.Use(middlewares.Cors())
 	app.Use(middlewares.Secure())
 	app.Use(middlewares.Gzip())
+	app.Use(middlewares.Recover())
 
 	app.GET("/swagger/*", echoSwagger.WrapHandler)
 

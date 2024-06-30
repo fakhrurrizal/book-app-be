@@ -12,6 +12,10 @@ import (
 	"gopkg.in/tylerb/graceful.v1"
 )
 
+// @title BOOK APP
+// @version 1.0
+// @description API documentation by BOOK APP
+
 func main() {
 	app := Start()
 
