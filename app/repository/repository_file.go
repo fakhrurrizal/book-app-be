@@ -6,6 +6,7 @@ import (
 	"book-app/app/utils"
 	"book-app/config"
 	"strconv"
+	"time"
 
 	"github.com/lib/pq"
 )
@@ -16,9 +17,14 @@ func SaveFile(data *models.GlobalFile) (err error) {
 		err = config.DB.Create(&data).Error
 		if err != nil {
 			if pqErr, ok := err.(*pq.Error); ok {
-				if pqErr.Code != "23505" {
+				if pqErr.Code == "23505" {
+					// Handle unique violation error, for example, regenerate token
+					data.Token = strconv.Itoa(int(time.Now().Unix())) + utils.GenerateRandomString(5)
+				} else {
 					created = true
 				}
+			} else {
+				created = true
 			}
 		} else {
 			created = true

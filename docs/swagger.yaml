@@ -42,6 +42,9 @@ definitions:
     type: object
 info:
   contact: {}
+  description: API documentation by BOOK APP
+  title: BOOK APP
+  version: "1.0"
 paths:
   /v1/book:
     get:

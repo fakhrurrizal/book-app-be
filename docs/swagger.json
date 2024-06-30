@@ -1,7 +1,10 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API documentation by BOOK APP",
+        "title": "BOOK APP",
+        "contact": {},
+        "version": "1.0"
     },
     "paths": {
         "/v1/book": {

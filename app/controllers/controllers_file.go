@@ -6,7 +6,6 @@ import (
 	"book-app/app/reqres"
 	"book-app/app/utils"
 	"book-app/config"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -29,27 +28,16 @@ import (
 // @Security ApiKeyAuth
 // @Security JwtToken
 func UploadFile(c echo.Context) error {
+	// Load location
 	location, err := time.LoadLocation("Asia/Jakarta")
 	if err != nil {
 		location = time.Local
-		err = nil
-		// return c.JSON(400, map[string]interface{}{
-		// 	"status":  400,
-		// 	"message": "Failed to get Asia/Jakarta time. Error: " + err.Error(),
-		// 	"error":   err.Error(),
-		// })
 	}
 
 	// Define the accepted MIME types
 	acceptedTypes := []string{
-		"image/png",
-		"image/jpeg",
-		"image/gif",
-		"video/quicktime",
-		"video/mp4",
-		"application/pdf",
-		"text/csv",
-		"application/vnd.ms-excel",
+		"image/png", "image/jpeg", "image/gif", "video/quicktime", "video/mp4",
+		"application/pdf", "text/csv", "application/vnd.ms-excel",
 		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 		"application/vnd.ms-excel.sheet.macroenabled.12",
 	}
@@ -57,42 +45,36 @@ func UploadFile(c echo.Context) error {
 	// Get the file from the request
 	file, err := c.FormFile("file")
 	if err != nil {
-		return err
+		c.Logger().Error("Error retrieving the file: ", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Error retrieving the file"})
 	}
 
 	// Get the MIME type of the file
 	fileType := file.Header.Get("Content-Type")
 	extension := ".jpg"
-	if fileType == "image/png" {
+	switch fileType {
+	case "image/png":
 		extension = ".png"
-	}
-	if fileType == "image/jpeg" {
+	case "image/jpeg":
 		extension = ".jpg"
-	}
-	if fileType == "image/gif" {
+	case "image/gif":
 		extension = ".gif"
-	}
-	if fileType == "video/quicktime" {
+	case "video/quicktime":
 		extension = ".mov"
-	}
-	if fileType == "video/mp4" {
+	case "video/mp4":
 		extension = ".mov"
-	}
-	if fileType == "application/pdf" {
+	case "application/pdf":
 		extension = ".pdf"
-	}
-	if fileType == "application/vnd.ms-excel" {
+	case "application/vnd.ms-excel":
 		extension = ".xls"
-	}
-	if fileType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
+	case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
 		extension = ".xlsx"
-	}
-	if fileType == "application/vnd.ms-excel.sheet.macroenabled.12" {
+	case "application/vnd.ms-excel.sheet.macroenabled.12":
 		extension = ".et"
-	}
-	if fileType == "text/csv" {
+	case "text/csv":
 		extension = ".csv"
 	}
+
 	var isAccepted bool
 	for _, t := range acceptedTypes {
 		if t == fileType {
@@ -102,6 +84,7 @@ func UploadFile(c echo.Context) error {
 	}
 
 	if !isAccepted {
+		c.Logger().Error("Unsupported file type: ", fileType)
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"accepted_type": acceptedTypes,
 		})
@@ -109,38 +92,41 @@ func UploadFile(c echo.Context) error {
 
 	src, err := file.Open()
 	if err != nil {
-		return err
+		c.Logger().Error("Error opening the file: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error opening the file"})
 	}
 	defer src.Close()
 
+	// Create directory if not exists
 	t := time.Now().In(location)
-	time := t.Format("2006-01")
-	folder := time
+	folder := t.Format("2006-01")
 	err = os.MkdirAll(config.RootPath()+"/assets/uploads/"+folder, os.ModePerm)
 	if err != nil {
-		return err
+		c.Logger().Error("Error creating directory: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating directory"})
 	}
-	timestamp := strconv.Itoa(int(t.Unix()))
 
+	timestamp := strconv.Itoa(int(t.Unix()))
 	filePath := filepath.Join(config.RootPath()+"/assets/uploads/", folder, timestamp+extension)
-	fmt.Println(filePath)
 	dst, err := os.Create(filePath)
 	if err != nil {
-		fmt.Println(err)
-		return err
+		c.Logger().Error("Error creating file: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating file"})
 	}
 	defer dst.Close()
 
 	if _, err = io.Copy(dst, src); err != nil {
-		return err
+		c.Logger().Error("Error copying file: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error copying file"})
 	}
 
 	data, err := SaveFileToDatabase(folder+"/"+timestamp+extension, filePath)
 	if err != nil {
+		c.Logger().Error("Error saving file to database: ", err)
 		return c.JSON(utils.ParseHttpError(err))
 	}
+
 	data.FullUrl = config.LoadConfig().BaseUrl + "/assets/uploads/" + folder + "/" + timestamp + extension
-	fmt.Print("data", data)
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":  200,
 		"data":    data,
