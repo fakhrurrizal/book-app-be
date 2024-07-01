@@ -62,7 +62,7 @@ func UploadFile(c echo.Context) error {
 	case "video/quicktime":
 		extension = ".mov"
 	case "video/mp4":
-		extension = ".mov"
+		extension = ".mp4"
 	case "application/pdf":
 		extension = ".pdf"
 	case "application/vnd.ms-excel":
@@ -70,7 +70,7 @@ func UploadFile(c echo.Context) error {
 	case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
 		extension = ".xlsx"
 	case "application/vnd.ms-excel.sheet.macroenabled.12":
-		extension = ".et"
+		extension = ".xlsm"
 	case "text/csv":
 		extension = ".csv"
 	}
@@ -97,30 +97,45 @@ func UploadFile(c echo.Context) error {
 	}
 	defer src.Close()
 
+	// Create temp directory if not exists
+	err = os.MkdirAll("/temp", os.ModePerm)
+	if err != nil {
+		c.Logger().Error("Error creating temp directory: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating temp directory"})
+	}
+
+	// Save file to temp directory
+	tempFilePath := filepath.Join("/temp", file.Filename)
+	tempFile, err := os.Create(tempFilePath)
+	if err != nil {
+		c.Logger().Error("Error creating temp file: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating temp file"})
+	}
+	defer tempFile.Close()
+
+	if _, err = io.Copy(tempFile, src); err != nil {
+		c.Logger().Error("Error copying to temp file: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error copying to temp file"})
+	}
+
 	// Create directory if not exists
 	t := time.Now().In(location)
 	folder := t.Format("2006-01")
-	err = os.MkdirAll(config.RootPath()+"/assets/uploads/"+folder, os.ModePerm)
+	uploadDir := filepath.Join(config.RootPath(), "assets/uploads", folder)
+	err = os.MkdirAll(uploadDir, os.ModePerm)
 	if err != nil {
 		c.Logger().Error("Error creating directory: ", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating directory"})
 	}
 
 	timestamp := strconv.Itoa(int(t.Unix()))
-	filePath := filepath.Join(config.RootPath()+"/assets/uploads/", folder, timestamp+extension)
-	dst, err := os.Create(filePath)
-	if err != nil {
-		c.Logger().Error("Error creating file: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating file"})
-	}
-	defer dst.Close()
-
-	if _, err = io.Copy(dst, src); err != nil {
-		c.Logger().Error("Error copying file: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error copying file"})
+	finalFilePath := filepath.Join(uploadDir, timestamp+extension)
+	if err = os.Rename(tempFilePath, finalFilePath); err != nil {
+		c.Logger().Error("Error moving file to final destination: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error moving file to final destination"})
 	}
 
-	data, err := SaveFileToDatabase(folder+"/"+timestamp+extension, filePath)
+	data, err := SaveFileToDatabase(folder+"/"+timestamp+extension, finalFilePath)
 	if err != nil {
 		c.Logger().Error("Error saving file to database: ", err)
 		return c.JSON(utils.ParseHttpError(err))
