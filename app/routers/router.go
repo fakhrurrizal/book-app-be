@@ -3,41 +3,36 @@ package router
 import (
 	"book-app/app/controllers"
 	"book-app/app/middlewares"
-	"book-app/config"
 	_ "book-app/docs"
-	"fmt"
 	"html/template"
 	"io"
 	"log"
-	"net/http"
-
-	echoSwagger "github.com/swaggo/echo-swagger"
 
 	"github.com/labstack/echo/v4"
 )
 
 func Init(app *echo.Echo) {
-	renderer := &TemplateRenderer{
-		templates: template.Must(template.ParseGlob("*.html")),
-	}
-	app.Renderer = renderer
+	// renderer := &TemplateRenderer{
+	// 	templates: template.Must(template.ParseGlob("*.html")),
+	// }
+	// app.Renderer = renderer
 	app.Use(middlewares.Cors())
 	app.Use(middlewares.Secure())
 	app.Use(middlewares.Gzip())
 	app.Use(middlewares.Recover())
 
-	app.GET("/swagger/*", echoSwagger.WrapHandler)
+	// app.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	app.GET("/docs", func(c echo.Context) error {
-		err := c.Render(http.StatusOK, "docs.html", map[string]interface{}{
-			"BaseUrl": config.LoadConfig().BaseUrl,
-			"Title":   "Dokumentasi API " + config.LoadConfig().AppName,
-		})
-		if err != nil {
-			fmt.Println("Error rendering docs.html:", err)
-		}
-		return err
-	})
+	// app.GET("/docs", func(c echo.Context) error {
+	// 	err := c.Render(http.StatusOK, "docs.html", map[string]interface{}{
+	// 		"BaseUrl": config.LoadConfig().BaseUrl,
+	// 		"Title":   "Dokumentasi API " + config.LoadConfig().AppName,
+	// 	})
+	// 	if err != nil {
+	// 		fmt.Println("Error rendering docs.html:", err)
+	// 	}
+	// 	return err
+	// })
 
 	app.GET("/", controllers.Index)
 

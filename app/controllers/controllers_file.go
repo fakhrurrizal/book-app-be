@@ -5,7 +5,6 @@ import (
 	"book-app/app/repository"
 	"book-app/app/reqres"
 	"book-app/app/utils"
-	"book-app/config"
 	"io"
 	"net/http"
 	"os"
@@ -117,7 +116,7 @@ func UploadFile(c echo.Context) error {
 		return c.JSON(utils.ParseHttpError(err))
 	}
 
-	data.FullUrl = config.LoadConfig().BaseUrl + "/temp/assets/uploads/" + folder + "/" + timestamp + extension
+	data.FullUrl = "/temp/assets/uploads/" + folder + "/" + timestamp + extension
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":  200,
 		"data":    data,
