@@ -28,13 +28,12 @@ import (
 // @Security ApiKeyAuth
 // @Security JwtToken
 func UploadFile(c echo.Context) error {
-	// Load location
 	location, err := time.LoadLocation("Asia/Jakarta")
 	if err != nil {
 		location = time.Local
+		err = nil
 	}
 
-	// Define the accepted MIME types
 	acceptedTypes := []string{
 		"image/png", "image/jpeg", "image/gif", "video/quicktime", "video/mp4",
 		"application/pdf", "text/csv", "application/vnd.ms-excel",
@@ -42,14 +41,11 @@ func UploadFile(c echo.Context) error {
 		"application/vnd.ms-excel.sheet.macroenabled.12",
 	}
 
-	// Get the file from the request
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.Logger().Error("Error retrieving the file: ", err)
-		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Error retrieving the file"})
+		return err
 	}
 
-	// Get the MIME type of the file
 	fileType := file.Header.Get("Content-Type")
 	extension := ".jpg"
 	switch fileType {
@@ -84,7 +80,6 @@ func UploadFile(c echo.Context) error {
 	}
 
 	if !isAccepted {
-		c.Logger().Error("Unsupported file type: ", fileType)
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"accepted_type": acceptedTypes,
 		})
@@ -92,60 +87,41 @@ func UploadFile(c echo.Context) error {
 
 	src, err := file.Open()
 	if err != nil {
-		c.Logger().Error("Error opening the file: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error opening the file"})
+		return err
 	}
 	defer src.Close()
 
-	// Create temp directory if not exists
-	err = os.MkdirAll("/temp", os.ModePerm)
-	if err != nil {
-		c.Logger().Error("Error creating temp directory: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating temp directory"})
-	}
-
-	// Save file to temp directory
-	tempFilePath := filepath.Join("/temp", file.Filename)
-	tempFile, err := os.Create(tempFilePath)
-	if err != nil {
-		c.Logger().Error("Error creating temp file: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating temp file"})
-	}
-	defer tempFile.Close()
-
-	if _, err = io.Copy(tempFile, src); err != nil {
-		c.Logger().Error("Error copying to temp file: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error copying to temp file"})
-	}
-
-	// Create directory if not exists
 	t := time.Now().In(location)
-	folder := t.Format("2006-01")
-	uploadDir := filepath.Join(config.RootPath(), "assets/uploads", folder)
+	time := t.Format("2006-01")
+	folder := time
+	uploadDir := "/temp/assets/uploads/" + folder
 	err = os.MkdirAll(uploadDir, os.ModePerm)
 	if err != nil {
-		c.Logger().Error("Error creating directory: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating directory"})
+		return err
 	}
 
 	timestamp := strconv.Itoa(int(t.Unix()))
-	finalFilePath := filepath.Join(uploadDir, timestamp+extension)
-	if err = os.Rename(tempFilePath, finalFilePath); err != nil {
-		c.Logger().Error("Error moving file to final destination: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error moving file to final destination"})
+	filePath := filepath.Join(uploadDir, timestamp+extension)
+	dst, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	if _, err = io.Copy(dst, src); err != nil {
+		return err
 	}
 
-	data, err := SaveFileToDatabase(folder+"/"+timestamp+extension, finalFilePath)
+	data, err := SaveFileToDatabase(folder+"/"+timestamp+extension, filePath)
 	if err != nil {
-		c.Logger().Error("Error saving file to database: ", err)
 		return c.JSON(utils.ParseHttpError(err))
 	}
 
-	data.FullUrl = config.LoadConfig().BaseUrl + "/assets/uploads/" + folder + "/" + timestamp + extension
+	data.FullUrl = config.LoadConfig().BaseUrl + "/temp/assets/uploads/" + folder + "/" + timestamp + extension
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":  200,
 		"data":    data,
-		"message": "Upload File Berhasil",
+		"message": "File uploaded successfully",
 	})
 }
 

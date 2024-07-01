@@ -33,8 +33,8 @@ type Config struct {
 
 func LoadConfig() (config *Config) {
 
-	if err := godotenv.Load(RootPath() + `/.env`); err != nil {
-		fmt.Println(err)
+	if err := godotenv.Load(RootPath() + `\.env`); err != nil {
+		fmt.Println("error", err)
 	}
 
 	appName := os.Getenv("APP_NAME")
