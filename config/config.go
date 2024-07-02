@@ -14,6 +14,9 @@ type Config struct {
 	AppName                     string
 	AppKey                      string
 	BaseUrl                     string
+	CloudinaryName              string
+	CloudinaryApiKey            string
+	CloudinaryApiSecret         string
 	Environtment                string
 	DatabaseUsername            string
 	DatabasePassword            string
@@ -43,6 +46,9 @@ func LoadConfig() (config *Config) {
 	environment := strings.ToUpper(os.Getenv("ENVIRONMENT"))
 	databaseUsername := os.Getenv("DATABASE_USERNAME")
 	databasePassword := os.Getenv("DATABASE_PASSWORD")
+	cloudinaryName := os.Getenv("CLOUDINARY_NAME")
+	cloudinaryApiKey := os.Getenv("CLOUDINARY_API_KEY")
+	cloudinaryApiSecret := os.Getenv("CLOUDINARY_API_SECRET")
 	databaseHost := os.Getenv("DATABASE_HOST")
 	databasePort := os.Getenv("DATABASE_PORT")
 	databaseName := os.Getenv("DATABASE_NAME")
@@ -75,6 +81,9 @@ func LoadConfig() (config *Config) {
 		EnableDatabaseAutomigration: enableDatabaseAutomigration,
 		Port:                        port,
 		APIKey:                      apiKey,
+		CloudinaryName:              cloudinaryName,
+		CloudinaryApiKey:            cloudinaryApiKey,
+		CloudinaryApiSecret:         cloudinaryApiSecret,
 	}
 }
 

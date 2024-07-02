@@ -5,13 +5,14 @@ import (
 	"book-app/app/repository"
 	"book-app/app/reqres"
 	"book-app/app/utils"
-	"io"
+	"book-app/config"
+	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"time"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/labstack/echo/v4"
 )
 
@@ -27,11 +28,11 @@ import (
 // @Security ApiKeyAuth
 // @Security JwtToken
 func UploadFile(c echo.Context) error {
-	location, err := time.LoadLocation("Asia/Jakarta")
-	if err != nil {
-		location = time.Local
-		err = nil
-	}
+	// location, err := time.LoadLocation("Asia/Jakarta")
+	// if err != nil {
+	// 	location = time.Local
+	// 	err = nil
+	// }
 
 	acceptedTypes := []string{
 		"image/png", "image/jpeg", "image/gif", "video/quicktime", "video/mp4",
@@ -90,33 +91,30 @@ func UploadFile(c echo.Context) error {
 	}
 	defer src.Close()
 
-	t := time.Now().In(location)
-	time := t.Format("2006-01")
-	folder := time
-	uploadDir := "/temp/assets/uploads/" + folder
-	err = os.MkdirAll(uploadDir, os.ModePerm)
+	// Initialize Cloudinary
+	cld, err := cloudinary.NewFromParams(config.LoadConfig().CloudinaryName, config.LoadConfig().CloudinaryApiKey, config.LoadConfig().CloudinaryApiSecret)
 	if err != nil {
 		return err
 	}
 
-	timestamp := strconv.Itoa(int(t.Unix()))
-	filePath := filepath.Join(uploadDir, timestamp+extension)
-	dst, err := os.Create(filePath)
+	// Upload file to Cloudinary
+	timestamp := strconv.Itoa(int(time.Now().Unix()))
+	uploadResult, err := cld.Upload.Upload(c.Request().Context(), src, uploader.UploadParams{
+		PublicID: fmt.Sprintf("uploads/%s%s", timestamp, extension),
+	})
 	if err != nil {
 		return err
 	}
-	defer dst.Close()
 
-	if _, err = io.Copy(dst, src); err != nil {
-		return err
-	}
-
-	data, err := SaveFileToDatabase(folder+"/"+timestamp+extension, filePath)
+	// Save the file URL to the database
+	data, err := SaveFileToDatabase(uploadResult.SecureURL, uploadResult.OriginalFilename)
 	if err != nil {
 		return c.JSON(utils.ParseHttpError(err))
 	}
 
-	data.FullUrl = "/temp/assets/uploads/" + folder + "/" + timestamp + extension
+	// Update FullUrl in the response
+	data.FullUrl = uploadResult.SecureURL
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":  200,
 		"data":    data,
