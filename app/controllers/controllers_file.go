@@ -6,13 +6,13 @@ import (
 	"book-app/app/reqres"
 	"book-app/app/utils"
 	"book-app/config"
-	"io"
+	"context"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"time"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/labstack/echo/v4"
 )
 
@@ -28,13 +28,12 @@ import (
 // @Security ApiKeyAuth
 // @Security JwtToken
 func UploadFile(c echo.Context) error {
-	// Load location
-	location, err := time.LoadLocation("Asia/Jakarta")
-	if err != nil {
-		location = time.Local
-	}
+	// location, err := time.LoadLocation("Asia/Jakarta")
+	// if err != nil {
+	// 	location = time.Local
+	// 	err = nil
+	// }
 
-	// Define the accepted MIME types
 	acceptedTypes := []string{
 		"image/png", "image/jpeg", "image/gif", "video/quicktime", "video/mp4",
 		"application/pdf", "text/csv", "application/vnd.ms-excel",
@@ -42,38 +41,35 @@ func UploadFile(c echo.Context) error {
 		"application/vnd.ms-excel.sheet.macroenabled.12",
 	}
 
-	// Get the file from the request
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.Logger().Error("Error retrieving the file: ", err)
-		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Error retrieving the file"})
+		return err
 	}
 
-	// Get the MIME type of the file
 	fileType := file.Header.Get("Content-Type")
-	extension := ".jpg"
-	switch fileType {
-	case "image/png":
-		extension = ".png"
-	case "image/jpeg":
-		extension = ".jpg"
-	case "image/gif":
-		extension = ".gif"
-	case "video/quicktime":
-		extension = ".mov"
-	case "video/mp4":
-		extension = ".mov"
-	case "application/pdf":
-		extension = ".pdf"
-	case "application/vnd.ms-excel":
-		extension = ".xls"
-	case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-		extension = ".xlsx"
-	case "application/vnd.ms-excel.sheet.macroenabled.12":
-		extension = ".et"
-	case "text/csv":
-		extension = ".csv"
-	}
+	// extension := ".jpg"
+	// switch fileType {
+	// case "image/png":
+	// 	extension = ".png"
+	// case "image/jpeg":
+	// 	extension = ".jpg"
+	// case "image/gif":
+	// 	extension = ".gif"
+	// case "video/quicktime":
+	// 	extension = ".mov"
+	// case "video/mp4":
+	// 	extension = ".mp4"
+	// case "application/pdf":
+	// 	extension = ".pdf"
+	// case "application/vnd.ms-excel":
+	// 	extension = ".xls"
+	// case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+	// 	extension = ".xlsx"
+	// case "application/vnd.ms-excel.sheet.macroenabled.12":
+	// 	extension = ".xlsm"
+	// case "text/csv":
+	// 	extension = ".csv"
+	// }
 
 	var isAccepted bool
 	for _, t := range acceptedTypes {
@@ -84,7 +80,6 @@ func UploadFile(c echo.Context) error {
 	}
 
 	if !isAccepted {
-		c.Logger().Error("Unsupported file type: ", fileType)
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"accepted_type": acceptedTypes,
 		})
@@ -92,45 +87,36 @@ func UploadFile(c echo.Context) error {
 
 	src, err := file.Open()
 	if err != nil {
-		c.Logger().Error("Error opening the file: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error opening the file"})
+		return err
 	}
 	defer src.Close()
 
-	// Create directory if not exists
-	t := time.Now().In(location)
-	folder := t.Format("2006-01")
-	err = os.MkdirAll(config.RootPath()+"/assets/uploads/"+folder, os.ModePerm)
+	// Initialize Cloudinary
+	cld, err := cloudinary.NewFromParams(config.LoadConfig().CloudinaryName, config.LoadConfig().CloudinaryApiKey, config.LoadConfig().CloudinaryApiSecret)
 	if err != nil {
-		c.Logger().Error("Error creating directory: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating directory"})
+		return err
 	}
 
-	timestamp := strconv.Itoa(int(t.Unix()))
-	filePath := filepath.Join(config.RootPath()+"/assets/uploads/", folder, timestamp+extension)
-	dst, err := os.Create(filePath)
+	var ctx = context.Background()
+	// Upload file to Cloudinary
+	uploadResult, err := cld.Upload.Upload(ctx, src, uploader.UploadParams{Folder: "book-app"})
 	if err != nil {
-		c.Logger().Error("Error creating file: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error creating file"})
+		return err
 	}
-	defer dst.Close()
-
-	if _, err = io.Copy(dst, src); err != nil {
-		c.Logger().Error("Error copying file: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Error copying file"})
-	}
-
-	data, err := SaveFileToDatabase(folder+"/"+timestamp+extension, filePath)
+	c.Set("cloudinarySecureURL", uploadResult.SecureURL)
+	// Save the file URL to the database
+	data, err := SaveFileToDatabase(uploadResult.SecureURL, uploadResult.OriginalFilename)
 	if err != nil {
-		c.Logger().Error("Error saving file to database: ", err)
 		return c.JSON(utils.ParseHttpError(err))
 	}
 
-	data.FullUrl = config.LoadConfig().BaseUrl + "/assets/uploads/" + folder + "/" + timestamp + extension
+	// Update FullUrl in the response
+	data.FullUrl = uploadResult.SecureURL
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":  200,
 		"data":    data,
-		"message": "Upload File Berhasil",
+		"message": "File uploaded successfully",
 	})
 }
 

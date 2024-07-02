@@ -4,6 +4,7 @@ import (
 	"book-app/app/repository"
 	"book-app/app/reqres"
 	"book-app/app/utils"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -24,7 +25,14 @@ func CreateBook(c echo.Context) error {
 		return c.JSON(400, utils.NewUnprocessableEntityError(err.Error()))
 	}
 
+	filepath, ok := c.Get("cloudinarySecureURL").(string)
+	if !ok {
+		return c.JSON(500, utils.Respond(500, errors.New("failed to get filepath from context"), "Failed to create"))
+	}
+
 	utils.StripTagsFromStruct(&input)
+
+	input.Image = filepath
 
 	data, err := repository.CreateBook(&input)
 	if err != nil {
