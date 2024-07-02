@@ -149,7 +149,25 @@ func UpdateBookByID(c echo.Context) error {
 		return c.JSON(400, utils.NewUnprocessableEntityError(err.Error()))
 	}
 
+	input.Title = c.FormValue("title")
+	input.Author = c.FormValue("author")
+	input.Publisher = c.FormValue("publisher")
+	input.BookCode = c.FormValue("book_code")
+	input.PublicationYear, _ = strconv.Atoi(c.FormValue("publication_year"))
+	input.Language = c.FormValue("language")
+	input.Description = c.FormValue("description")
+	input.NumberOfPages, _ = strconv.Atoi(c.FormValue("number_of_pages"))
+	input.CategoryID, _ = strconv.Atoi(c.FormValue("category_id"))
+	input.Status, _ = strconv.ParseBool(c.FormValue("status"))
+
+	filepath, ok := c.Get("cloudinarySecureURL").(string)
+	if !ok {
+		return c.JSON(500, utils.Respond(500, errors.New("failed to get filepath from context"), "Failed to create"))
+	}
+
 	utils.StripTagsFromStruct(&input)
+
+	input.Image = filepath
 
 	id, _ := strconv.Atoi(c.Param("id"))
 

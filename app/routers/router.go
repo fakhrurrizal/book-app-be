@@ -46,7 +46,7 @@ func Init(app *echo.Echo) {
 			book.GET("/:id", controllers.GetBookByID)
 			book.GET("", controllers.GetBooks)
 			book.DELETE("/:id", controllers.DeleteBookByID)
-			book.PUT("/:id", controllers.UpdateBookByID)
+			book.PUT("/:id", middlewares.UploadFile(controllers.UpdateBookByID))
 		}
 		category := api.Group("/book-category")
 		{
