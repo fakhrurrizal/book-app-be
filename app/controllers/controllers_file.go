@@ -28,12 +28,6 @@ import (
 // @Security ApiKeyAuth
 // @Security JwtToken
 func UploadFile(c echo.Context) error {
-	// location, err := time.LoadLocation("Asia/Jakarta")
-	// if err != nil {
-	// 	location = time.Local
-	// 	err = nil
-	// }
-
 	acceptedTypes := []string{
 		"image/png", "image/jpeg", "image/gif", "video/quicktime", "video/mp4",
 		"application/pdf", "text/csv", "application/vnd.ms-excel",
