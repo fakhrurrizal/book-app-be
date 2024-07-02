@@ -148,7 +148,6 @@ func UpdateBookByID(c echo.Context) error {
 	if err := c.Bind(&input); err != nil {
 		return c.JSON(400, utils.NewUnprocessableEntityError(err.Error()))
 	}
-
 	input.Title = c.FormValue("title")
 	input.Author = c.FormValue("author")
 	input.Publisher = c.FormValue("publisher")
@@ -166,65 +165,54 @@ func UpdateBookByID(c echo.Context) error {
 	}
 
 	utils.StripTagsFromStruct(&input)
-
 	input.Image = filepath
-
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	data, err := repository.GetBookByIDPlain(id)
-
 	if err != nil {
 		return c.JSON(500, utils.Respond(500, err, "Data tidak tersedia"))
 	}
 
+	// Update book fields
 	if input.Title != "" {
 		data.Title = input.Title
 	}
-
 	if input.Author != "" {
 		data.Author = input.Author
 	}
-
 	if input.Description != "" {
 		data.Description = input.Description
 	}
-
 	if input.Image != "" {
 		data.Image = input.Image
 	}
-
 	if input.Publisher != "" {
 		data.Publisher = input.Publisher
 	}
-
 	if input.BookCode != "" {
 		data.BookCode = input.BookCode
 	}
-
 	if input.Language != "" {
 		data.Language = input.Language
 	}
-
 	if input.CategoryID != 0 {
 		data.CategoryID = input.CategoryID
 	}
-
 	if input.NumberOfPages != 0 {
 		data.NumberOfPages = input.NumberOfPages
 	}
-
 	if input.PublicationYear != 0 {
 		data.PublicationYear = input.PublicationYear
 	}
-
 	data.Status = input.Status
 
+	// Save updated data to repository
 	dataUpdate, err := repository.UpdateBook(data)
-
 	if err != nil {
 		return c.JSON(500, utils.Respond(500, err, "Gagal mengubah data"))
 	}
 
+	// Retrieve and return updated book data
 	response, err := repository.GetBookByID(int(dataUpdate.ID))
 	if err != nil {
 		return c.JSON(404, utils.Respond(404, err, "Failed to get response"))

@@ -34,7 +34,7 @@ func UploadFile(next echo.HandlerFunc) echo.HandlerFunc {
 		var method = c.Request().Method
 		file, err := c.FormFile("image")
 		if err != nil {
-			if (method == "PATCH" || method == "POST") && err.Error() == "http: no such file" {
+			if (method == "PUT" || method == "POST") && err.Error() == "http: no such file" {
 				c.Set("cloudinarySecureURL", "")
 				return next(c)
 			}
