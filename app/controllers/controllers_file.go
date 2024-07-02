@@ -28,61 +28,9 @@ import (
 // @Security ApiKeyAuth
 // @Security JwtToken
 func UploadFile(c echo.Context) error {
-	// location, err := time.LoadLocation("Asia/Jakarta")
-	// if err != nil {
-	// 	location = time.Local
-	// 	err = nil
-	// }
-
-	acceptedTypes := []string{
-		"image/png", "image/jpeg", "image/gif", "video/quicktime", "video/mp4",
-		"application/pdf", "text/csv", "application/vnd.ms-excel",
-		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-		"application/vnd.ms-excel.sheet.macroenabled.12",
-	}
-
 	file, err := c.FormFile("file")
 	if err != nil {
 		return err
-	}
-
-	fileType := file.Header.Get("Content-Type")
-	// extension := ".jpg"
-	// switch fileType {
-	// case "image/png":
-	// 	extension = ".png"
-	// case "image/jpeg":
-	// 	extension = ".jpg"
-	// case "image/gif":
-	// 	extension = ".gif"
-	// case "video/quicktime":
-	// 	extension = ".mov"
-	// case "video/mp4":
-	// 	extension = ".mp4"
-	// case "application/pdf":
-	// 	extension = ".pdf"
-	// case "application/vnd.ms-excel":
-	// 	extension = ".xls"
-	// case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-	// 	extension = ".xlsx"
-	// case "application/vnd.ms-excel.sheet.macroenabled.12":
-	// 	extension = ".xlsm"
-	// case "text/csv":
-	// 	extension = ".csv"
-	// }
-
-	var isAccepted bool
-	for _, t := range acceptedTypes {
-		if t == fileType {
-			isAccepted = true
-			break
-		}
-	}
-
-	if !isAccepted {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"accepted_type": acceptedTypes,
-		})
 	}
 
 	src, err := file.Open()
@@ -97,25 +45,16 @@ func UploadFile(c echo.Context) error {
 		return err
 	}
 
-	var ctx = context.Background()
 	// Upload file to Cloudinary
+	var ctx = context.Background()
 	uploadResult, err := cld.Upload.Upload(ctx, src, uploader.UploadParams{Folder: "book-app"})
 	if err != nil {
 		return err
 	}
-	c.Set("cloudinarySecureURL", uploadResult.SecureURL)
-	// Save the file URL to the database
-	data, err := SaveFileToDatabase(uploadResult.SecureURL, uploadResult.OriginalFilename)
-	if err != nil {
-		return c.JSON(utils.ParseHttpError(err))
-	}
 
-	// Update FullUrl in the response
-	data.FullUrl = uploadResult.SecureURL
+	c.Set("cloudinarySecureURL", uploadResult.SecureURL)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"status":  200,
-		"data":    data,
 		"message": "File uploaded successfully",
 	})
 }
