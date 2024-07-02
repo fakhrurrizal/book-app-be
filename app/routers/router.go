@@ -42,7 +42,7 @@ func Init(app *echo.Echo) {
 	{
 		book := api.Group("/book")
 		{
-			book.POST("", controllers.CreateBook)
+			book.POST("", middlewares.UploadFile(controllers.CreateBook))
 			book.GET("/:id", controllers.GetBookByID)
 			book.GET("", controllers.GetBooks)
 			book.DELETE("/:id", controllers.DeleteBookByID)
@@ -56,11 +56,11 @@ func Init(app *echo.Echo) {
 			category.DELETE("/:id", controllers.DeleteBookCategoryByID)
 			category.PUT("/:id", controllers.UpdateBookCategoryByID)
 		}
-		files := api.Group("/file")
-		{
-			files.POST("", controllers.UploadFile)
-			files.GET("", controllers.GetFile)
-		}
+		// files := api.Group("/file")
+		// {
+		// 	files.POST("", controllers.UploadFile)
+		// 	files.GET("", controllers.GetFile)
+		// }
 	}
 
 	log.Printf("Server started...")

@@ -21,9 +21,17 @@ import (
 // @Router /v1/book [post]
 func CreateBook(c echo.Context) error {
 	var input reqres.BookRequest
-	if err := c.Bind(&input); err != nil {
-		return c.JSON(400, utils.NewUnprocessableEntityError(err.Error()))
-	}
+
+	input.Title = c.FormValue("title")
+	input.Author = c.FormValue("author")
+	input.Publisher = c.FormValue("publisher")
+	input.BookCode = c.FormValue("book_code")
+	input.PublicationYear, _ = strconv.Atoi(c.FormValue("publication_year"))
+	input.Language = c.FormValue("language")
+	input.Description = c.FormValue("description")
+	input.NumberOfPages, _ = strconv.Atoi(c.FormValue("number_of_pages"))
+	input.CategoryID, _ = strconv.Atoi(c.FormValue("category_id"))
+	input.Status, _ = strconv.ParseBool(c.FormValue("status"))
 
 	filepath, ok := c.Get("cloudinarySecureURL").(string)
 	if !ok {
@@ -31,7 +39,6 @@ func CreateBook(c echo.Context) error {
 	}
 
 	utils.StripTagsFromStruct(&input)
-
 	input.Image = filepath
 
 	data, err := repository.CreateBook(&input)

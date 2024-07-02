@@ -1,14 +1,20 @@
-package controllers
+package middlewares
 
 import (
 	"book-app/app/models"
 	"book-app/app/repository"
 	"book-app/app/reqres"
 	"book-app/app/utils"
+	"book-app/config"
+	"context"
+	"fmt"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"time"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,41 +29,50 @@ import (
 // @Router /v1/file [post]
 // @Security ApiKeyAuth
 // @Security JwtToken
-// func UploadFile(next echo.HandlerFunc) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		file, err := c.FormFile("file")
-// 		if err != nil {
-// 			return err
-// 		}
-// 		ext := filepath.Ext(file.Filename)
-// 		if ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".webp" {
-// 			src, err := file.Open()
-// 			if err != nil {
-// 				return err
-// 			}
-// 			defer src.Close()
+func UploadFile(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var method = c.Request().Method
+		file, err := c.FormFile("image")
+		if err != nil {
+			if (method == "PATCH" || method == "POST") && err.Error() == "http: no such file" {
+				c.Set("cloudinarySecureURL", "")
+				return next(c)
+			}
+			return c.JSON(http.StatusBadRequest, err)
+		}
 
-// 			// Initialize Cloudinary
-// 			cld, err := cloudinary.NewFromParams(config.LoadConfig().CloudinaryName, config.LoadConfig().CloudinaryApiKey, config.LoadConfig().CloudinaryApiSecret)
-// 			if err != nil {
-// 				fmt.Print("cld", err)
-// 				return err
-// 			}
+		ext := filepath.Ext(file.Filename)
+		if ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".webp" {
+			src, err := file.Open()
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, err)
+			}
+			defer src.Close()
 
-// 			var ctx = context.Background()
-// 			uploadResult, err := cld.Upload.Upload(ctx, src, uploader.UploadParams{Folder: "book-app"})
-// 			if err != nil {
-// 				fmt.Print("uploadResult", err)
-// 				return err
-// 			}
-// 			c.Set("cloudinarySecureURL", uploadResult.SecureURL)
+			var ctx = context.Background()
+			cld, err := cloudinary.NewFromParams(
+				config.LoadConfig().CloudinaryName,
+				config.LoadConfig().CloudinaryApiKey,
+				config.LoadConfig().CloudinaryApiSecret,
+			)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, fmt.Sprintf("Failed to initialize Cloudinary: %v", err))
+			}
 
-// 			return next(c)
-// 		}
+			resp, err := cld.Upload.Upload(ctx, src, uploader.UploadParams{Folder: "book-app"})
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, fmt.Sprintf("Failed to upload file to Cloudinary: %v", err))
+			}
 
-// 	}
+			fmt.Print("resp", resp)
 
-// }
+			c.Set("cloudinarySecureURL", resp.SecureURL)
+			return next(c)
+		} else {
+			return c.JSON(http.StatusBadRequest, "The file extension is wrong. Allowed file extensions are images (.png, .jpg, .jpeg, .webp)")
+		}
+	}
+}
 
 func SaveFileToDatabase(filename, path string) (data models.GlobalFile, err error) {
 	location, err := time.LoadLocation("Asia/Jakarta")
