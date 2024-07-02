@@ -1,4 +1,4 @@
-package handler
+package main
 
 import (
 	router "book-app/app/routers"
