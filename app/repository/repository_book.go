@@ -108,12 +108,7 @@ func GetBooks(categoryID int, param reqres.ReqPaging) (data reqres.ResPaging) {
 
 	bookQueue := &utils.BookQueue{}
 	if param.Search != "" {
-		for _, book := range responses {
-			if strings.Contains(strings.ToLower(book.Title), strings.ToLower(param.Search)) ||
-				strings.Contains(strings.ToLower(book.Description), strings.ToLower(param.Search)) {
-				bookQueue.Enqueue(BuildBookResponse(book))
-			}
-		}
+		SequentialSearch(responses, param.Search, bookQueue)
 	} else {
 		for _, book := range responses {
 			bookQueue.Enqueue(BuildBookResponse(book))
@@ -140,6 +135,15 @@ func GetBooks(categoryID int, param reqres.ReqPaging) (data reqres.ResPaging) {
 	data = utils.PopulateResPaging(&param, pagedResponses, totalResult, totalFiltered)
 
 	return data
+}
+
+func SequentialSearch(responses []models.Book, search string, bookQueue *utils.BookQueue) {
+	for _, book := range responses {
+		if strings.Contains(strings.ToLower(book.Title), strings.ToLower(search)) ||
+			strings.Contains(strings.ToLower(book.Description), strings.ToLower(search)) {
+			bookQueue.Enqueue(BuildBookResponse(book))
+		}
+	}
 }
 
 func sortBooks(books *[]reqres.BookResponse, sortField string, sortOrder string) {
@@ -172,22 +176,6 @@ func sortBooks(books *[]reqres.BookResponse, sortField string, sortOrder string)
 	}
 }
 
-func GetAllBooksPlain(search string, categoryID int) (responses []models.Book, err error) {
-	where := "deleted_at IS NULL AND status = true"
-
-	if search != "" {
-		where += " AND name ILIKE '%" + search + "%' OR code ILIKE '%" + search + "%' AND barcode ILIKE '%" + search + "%'"
-	}
-
-	if categoryID > 0 {
-		where += " AND category_id = " + strconv.Itoa(categoryID)
-	}
-
-	err = config.DB.Where(where).Find(&responses).Error
-
-	return
-}
-
 func bubbleSort(books *[]reqres.BookResponse, less func(a, b reqres.BookResponse) bool) {
 	n := len(*books)
 	for i := 0; i < n-1; i++ {
@@ -197,6 +185,22 @@ func bubbleSort(books *[]reqres.BookResponse, less func(a, b reqres.BookResponse
 			}
 		}
 	}
+}
+
+func GetAllBooksPlain(search string, categoryID int) (responses []models.Book, err error) {
+	where := "deleted_at IS NULL AND status = true"
+
+	if search != "" {
+		where += " AND (name ILIKE '%" + search + "%' OR code ILIKE '%" + search + "%' OR barcode ILIKE '%" + search + "%')"
+	}
+
+	if categoryID > 0 {
+		where += " AND category_id = " + strconv.Itoa(categoryID)
+	}
+
+	err = config.DB.Where(where).Find(&responses).Error
+
+	return
 }
 
 func DeleteBook(request models.Book) (models.Book, error) {

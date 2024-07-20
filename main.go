@@ -3,27 +3,24 @@ package handler
 import (
 	router "book-app/app/routers"
 	"book-app/config"
-	"log"
 	"net/http"
-	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
-	"gopkg.in/tylerb/graceful.v1"
 )
 
 // @title BOOK APP
 // @version 1.0
 // @description API documentation by BOOK APP
 
-func main() {
-	app := Start()
+// func main() {
+// 	app := Start()
 
-	app.Server.Addr = "127.0.0.1:" + config.LoadConfig().Port
-	log.Printf("Server: " + config.LoadConfig().BaseUrl)
+// 	app.Server.Addr = "127.0.0.1:" + config.LoadConfig().Port
+// 	log.Printf("Server: " + config.LoadConfig().BaseUrl)
 
-	graceful.ListenAndServe(app.Server, 5*time.Second)
-}
+// 	graceful.ListenAndServe(app.Server, 5*time.Second)
+// }
 
 func Main(w http.ResponseWriter, r *http.Request) {
 	e := Start()
