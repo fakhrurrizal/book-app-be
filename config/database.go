@@ -34,7 +34,7 @@ func Database() *gorm.DB {
 			&models.GlobalUser{},
 			&models.GlobalSignin{},
 			&models.BookLending{},
-			&models.GlobalUser{},
+			&models.GlobalRole{},
 		)
 		if err != nil {
 			log.Fatalf("Auto migration failed: %v", err)
@@ -49,7 +49,6 @@ func Database() *gorm.DB {
 	return DB
 
 }
-
 
 func GetRespectiveID(db *gorm.DB, tablename string, synchronizeSequence bool) (respectiveID uint, err error) {
 	err = db.Unscoped().Table(tablename).Order("id desc").Limit(1).Pluck("id", &respectiveID).Error
