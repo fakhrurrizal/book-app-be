@@ -1,18 +1,5 @@
 package models
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
-
-type CustomGormModel struct {
-	ID        uint            `gorm:"primary_key" json:"id"`
-	CreatedAt time.Time       `json:"created_at"`
-	UpdatedAt time.Time       `json:"updated_at"`
-	DeletedAt *gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
-}
-
 type Book struct {
 	CustomGormModel
 	Title           string `json:"title" gorm:"type: varchar(255)"`

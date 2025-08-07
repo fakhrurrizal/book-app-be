@@ -3,7 +3,6 @@ package router
 import (
 	"book-app/app/controllers"
 	"book-app/app/middlewares"
-	_ "book-app/docs"
 	"html/template"
 	"io"
 	"log"
@@ -40,27 +39,36 @@ func Init(app *echo.Echo) {
 
 	api := app.Group("/v1", middlewares.StripHTMLMiddleware)
 	{
+		auth := api.Group("/auth")
+		{
+			auth.POST("/signin", controllers.SignIn)
+			auth.POST("/signup", controllers.SignUp)
+			auth.GET("/user", controllers.GetSignInUser, middlewares.Auth())
+		}
 		book := api.Group("/book")
 		{
-			book.POST("", middlewares.UploadFile(controllers.CreateBook))
+			book.POST("", controllers.UploadFile(controllers.CreateBook), middlewares.Auth())
 			book.GET("/:id", controllers.GetBookByID)
 			book.GET("", controllers.GetBooks)
-			book.DELETE("/:id", controllers.DeleteBookByID)
-			book.PUT("/:id", middlewares.UploadFile(controllers.UpdateBookByID))
+			book.DELETE("/:id", controllers.DeleteBookByID, middlewares.Auth())
+			book.PUT("/:id", controllers.UploadFile(controllers.UpdateBookByID), middlewares.Auth())
 		}
 		category := api.Group("/book-category")
 		{
-			category.POST("", controllers.CreateBookCategory)
+			category.POST("", controllers.CreateBookCategory, middlewares.Auth())
 			category.GET("/:id", controllers.GetBookCategoryByID)
 			category.GET("", controllers.GetBookCategories)
-			category.DELETE("/:id", controllers.DeleteBookCategoryByID)
-			category.PUT("/:id", controllers.UpdateBookCategoryByID)
+			category.DELETE("/:id", controllers.DeleteBookCategoryByID, middlewares.Auth())
+			category.PUT("/:id", controllers.UpdateBookCategoryByID, middlewares.Auth())
 		}
-		// files := api.Group("/file")
-		// {
-		// 	files.POST("", controllers.UploadFile)
-		// 	files.GET("", controllers.GetFile)
-		// }
+		book_lending := api.Group("/book-lending")
+		{
+			book_lending.POST("", controllers.CreateBookLending, middlewares.Auth())
+			book_lending.GET("/:id", controllers.GetBookLendingByID)
+			book_lending.GET("", controllers.GetBookLendings)
+			book_lending.DELETE("/:id", controllers.DeleteBookLendingByID, middlewares.Auth())
+			book_lending.PUT("/:id", controllers.UpdateBookLendingByID, middlewares.Auth())
+		}
 	}
 
 	log.Printf("Server started...")

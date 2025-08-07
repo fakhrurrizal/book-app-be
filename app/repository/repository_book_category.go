@@ -39,7 +39,7 @@ func CreateBookCategory(data *reqres.BookCategoryRequest) (response models.BookC
 
 func BuildBookCategoryResponse(data models.BookCategory) (response reqres.BookCategoryResponse) {
 
-	response.CustomGormModel = reqres.CustomGormModel(data.CustomGormModel)
+	response.CustomGormModel = data.CustomGormModel
 	response.Name = data.Name
 	response.Description = data.Description
 	response.Status = data.Status

@@ -46,3 +46,41 @@ func Database() *gorm.DB {
 	return DB
 
 }
+
+
+func GetRespectiveID(db *gorm.DB, tablename string, synchronizeSequence bool) (respectiveID uint, err error) {
+	err = db.Unscoped().Table(tablename).Order("id desc").Limit(1).Pluck("id", &respectiveID).Error
+	if err != nil {
+		return
+	}
+
+	if respectiveID == 0 {
+		err = fmt.Errorf("no data found in table %s", tablename)
+
+		return
+	}
+
+	if respectiveID%2 == 0 {
+		respectiveID += 2
+	} else {
+		respectiveID += 1
+	}
+	if synchronizeSequence {
+		err = SynchronizeSequence(db, tablename, respectiveID)
+	}
+
+	return
+}
+
+func SynchronizeSequence(db *gorm.DB, table string, lastID uint) error {
+	sequenceQuery := fmt.Sprintf(
+		"SELECT setval(pg_get_serial_sequence('%s', 'id'), %v)",
+		table, lastID,
+	)
+	err := DB.Exec(sequenceQuery).Error
+	if err != nil {
+		return fmt.Errorf("failed to synchronize sequence for table %s: %w", table, err)
+	}
+
+	return nil
+}

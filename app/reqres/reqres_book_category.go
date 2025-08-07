@@ -1,6 +1,8 @@
 package reqres
 
 import (
+	"book-app/app/models"
+
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -19,7 +21,7 @@ func (request BookCategoryRequest) Validate() error {
 }
 
 type BookCategoryResponse struct {
-	CustomGormModel
+	models.CustomGormModel
 	Name        string `json:"name"  validate:"required"`
 	Description string `json:"description" `
 	Icon        string `json:"icon"`

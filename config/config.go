@@ -32,6 +32,7 @@ type Config struct {
 	Port                        string
 	EnableDatabaseAutomigration bool
 	APIKey                      string
+		EnableIDDuplicationHandling bool
 }
 
 func LoadConfig() (config *Config) {
@@ -61,6 +62,7 @@ func LoadConfig() (config *Config) {
 	enableDatabaseAutomigration, _ := strconv.ParseBool(os.Getenv("ENABLE_DATABASE_AUTOMIGRATION"))
 	port := os.Getenv("PORT")
 	apiKey := os.Getenv("API_KEY")
+	enableIDDuplicationHandling, _ := strconv.ParseBool(os.Getenv("ENABLE_ID_DUPLICATION_HANDLING"))
 
 	return &Config{
 		AppName:                     appName,
@@ -84,6 +86,7 @@ func LoadConfig() (config *Config) {
 		CloudinaryName:              cloudinaryName,
 		CloudinaryApiKey:            cloudinaryApiKey,
 		CloudinaryApiSecret:         cloudinaryApiSecret,
+		EnableIDDuplicationHandling: enableIDDuplicationHandling,
 	}
 }
 

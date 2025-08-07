@@ -31,6 +31,15 @@ func GenerateRandomString(length int) string {
 	return string(bytes)
 }
 
+func GetTimeLocation() (response *time.Location) {
+	response, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		response = time.Local
+	}
+
+	return
+}
+
 func Makerank(rank_step, min, max, target_value float64) int {
 	range_size := (max - min) / rank_step
 	rank := int((target_value - min) / range_size)
