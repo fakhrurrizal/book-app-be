@@ -14,8 +14,10 @@ func SignIn(email, password string) (user models.GlobalUser, token string, err e
 	err = config.DB.
 		Where("email = '" + strings.ToLower(email) + "'").First(&user).Error
 	if err != nil {
+		err = errors.New("Email belum terdaftar")
 		return
 	}
+
 	err = middlewares.VerifyPassword(password, user.Password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		err = errors.New("incorrect password")
