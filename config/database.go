@@ -31,7 +31,10 @@ func Database() *gorm.DB {
 		err = DB.AutoMigrate(
 			&models.Book{},
 			&models.BookCategory{},
-			&models.GlobalFile{},
+			&models.GlobalUser{},
+			&models.GlobalSignin{},
+			&models.BookLending{},
+			&models.GlobalUser{},
 		)
 		if err != nil {
 			log.Fatalf("Auto migration failed: %v", err)
