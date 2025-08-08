@@ -130,10 +130,9 @@ func GetBookCategoryIDPlain(id int) (response models.BookCategory, err error) {
 }
 
 func DeleteBookCategory(request models.BookCategory) (models.BookCategory, error) {
-	// Cek apakah ada buku yang menggunakan kategori ini
 	var count int64
 	err := config.DB.Model(&models.Book{}).
-		Where("book_category_id = ?", request.ID).
+		Where("category_id = ?", request.ID).
 		Count(&count).Error
 	if err != nil {
 		return request, err
@@ -146,7 +145,6 @@ func DeleteBookCategory(request models.BookCategory) (models.BookCategory, error
 	err = config.DB.Delete(&request).Error
 	return request, err
 }
-
 
 func UpdateBookCategory(request models.BookCategory) (response models.BookCategory, err error) {
 	err = config.DB.Save(&request).Scan(&response).Error
