@@ -7,7 +7,7 @@ import (
 type BookLending struct {
 	CustomGormModel
 	BookID     int       `json:"book_id" gorm:"type: int;not null"`
-	UserID     int       `json:"borrower_id" gorm:"type: int;not null"`
+	UserID     int       `json:"user_id" gorm:"type: int;not null"`
 	BorrowDate null.Time `json:"borrow_date"  gorm:"type:timestamptz"`
 	DueDate    null.Time `json:"due_date"  gorm:"type:timestamptz"`
 	ReturnDate null.Time `json:"return_date"  gorm:"type:timestamptz"`
