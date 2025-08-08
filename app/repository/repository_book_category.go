@@ -87,6 +87,7 @@ func GetBookCategories(param reqres.ReqPaging) (data reqres.ResPaging) {
 	config.DB.Debug().Model(&modelTotal).Where(where).Count(&totalResult)
 
 	var totalFiltered int64
+		config.DB.Model(&modelTotal).Where(where).Count(&totalFiltered)
 
 	config.DB.Limit(param.Limit).Offset(param.Offset).Order(param.Sort + " " + param.Order).Where(where).Find(&responses)
 
