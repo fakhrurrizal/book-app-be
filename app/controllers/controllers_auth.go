@@ -133,6 +133,7 @@ func SignIn(c echo.Context) error {
 	userResponse.City = userData.City
 	userResponse.Province = userData.Province
 	userResponse.Country = userData.Country
+	userResponse.IdAnggota = userData.IdAnggota
 	userResponse.Role.ID = userData.RoleID
 
 	return c.JSON(http.StatusOK, map[string]interface{}{

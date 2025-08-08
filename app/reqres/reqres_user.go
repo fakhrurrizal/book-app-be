@@ -5,7 +5,6 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
-	"github.com/guregu/null"
 )
 
 type SignUpRequest struct {
@@ -70,35 +69,20 @@ func (request GlobalUserRequest) Validate() error {
 
 type GlobalUserResponse struct {
 	models.CustomGormModel
-	Avatar                string               `json:"avatar"`
-	Fullname              string               `json:"fullname"`
-	Email                 string               `json:"email"`
-	Password              string               `json:"-"`
-	Phone                 string               `json:"phone"`
-	Address               string               `json:"address"`
-	Village               string               `json:"village"`
-	District              string               `json:"district"`
-	City                  string               `json:"city"`
-	Gender                string               `json:"gender"`
-	Province              string               `json:"province"`
-	Country               string               `json:"country"`
-	ZipCode               string               `json:"zip_code"`
-	IdAnggota             string               `json:"id_anggota"`
-	Status                int                  `json:"status"`
-	Role                  GlobalIDNameResponse `json:"role"`
-	Department            GlobalIDNameResponse `json:"department"`
-	Branch                GlobalIDNameResponse `json:"branch"`
-	Plant                 GlobalIDNameResponse `json:"plant"`
-	Company               GlobalIDNameResponse `json:"company"`
-	App                   GlobalIDNameResponse `json:"app"`
-	EmailVerifiedAt       null.Time            `json:"-"`
-	EmployeeID            string               `json:"employee_id,omitempty"`
-	Payday                null.Time            `json:"payday,omitempty"`
-	LastSalary            float64              `json:"last_salary,omitempty"`
-	BackofficeAccess      bool                 `json:"backoffice_access"`
-	TotalSaleQuantity     int                  `json:"total_sale_quantity"`
-	TotalSalePrice        int                  `json:"total_sale_price"`
-	TotalPurchaseQuantity int                  `json:"total_purchase_quantity"`
-	TotalPurchasePrice    int                  `json:"total_purchase_price"`
-	CompanyRole           GlobalIDNameResponse `json:"company_role"`
+	Avatar    string               `json:"avatar"`
+	Fullname  string               `json:"fullname"`
+	Email     string               `json:"email"`
+	Password  string               `json:"-"`
+	Phone     string               `json:"phone"`
+	Address   string               `json:"address"`
+	Village   string               `json:"village"`
+	District  string               `json:"district"`
+	City      string               `json:"city"`
+	Gender    string               `json:"gender"`
+	Province  string               `json:"province"`
+	Country   string               `json:"country"`
+	ZipCode   string               `json:"zip_code"`
+	IdAnggota string               `json:"id_anggota"`
+	Status    int                  `json:"status"`
+	Role      GlobalIDNameResponse `json:"role"`
 }

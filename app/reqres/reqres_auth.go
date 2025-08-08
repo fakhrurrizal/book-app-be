@@ -54,6 +54,7 @@ type GlobalUserAuthResponse struct {
 	Province      string               `json:"province"`
 	Country       string               `json:"country"`
 	ZipCode       string               `json:"zip_code"`
+	IdAnggota     string               `json:"id_anggota"`
 	Status        int                  `json:"status"`
 	Gender        string               `json:"gender"`
 	Role          GlobalIDNameResponse `json:"role"`
