@@ -66,6 +66,17 @@ func BuildBookResponse(data models.Book) (response reqres.BookResponse) {
 		books.Category.ID = int(category.ID)
 		books.Category.Name = category.Name
 	}
+	var jumlahDipinjam int64
+	_ = config.DB.
+		Model(&models.BookLending{}).
+		Where("book_id = ? AND status IN ?", data.ID, []string{"approved", "borrowed", "overdue"}).
+		Count(&jumlahDipinjam).Error
+
+	stockAvailable := data.Stock - int(jumlahDipinjam)
+	if stockAvailable < 0 {
+		stockAvailable = 0
+	}
+	books.StockAvailable = stockAvailable
 
 	response = books
 

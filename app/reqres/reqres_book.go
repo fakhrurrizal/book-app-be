@@ -56,6 +56,7 @@ type BookResponse struct {
 	Language        string               `json:"language"`
 	Description     string               `json:"description"`
 	NumberOfPages   int                  `json:"number_of_pages"`
+	StockAvailable  int                  `json:"stock_available"`
 	Status          bool                 `json:"status"`
 	Category        GlobalIDNameResponse `json:"category" `
 }
