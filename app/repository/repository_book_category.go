@@ -5,6 +5,7 @@ import (
 	"book-app/app/reqres"
 	"book-app/app/utils"
 	"book-app/config"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -87,7 +88,7 @@ func GetBookCategories(param reqres.ReqPaging) (data reqres.ResPaging) {
 	config.DB.Debug().Model(&modelTotal).Where(where).Count(&totalResult)
 
 	var totalFiltered int64
-		config.DB.Model(&modelTotal).Where(where).Count(&totalFiltered)
+	config.DB.Model(&modelTotal).Where(where).Count(&totalFiltered)
 
 	config.DB.Limit(param.Limit).Offset(param.Offset).Order(param.Sort + " " + param.Order).Where(where).Find(&responses)
 
@@ -129,10 +130,23 @@ func GetBookCategoryIDPlain(id int) (response models.BookCategory, err error) {
 }
 
 func DeleteBookCategory(request models.BookCategory) (models.BookCategory, error) {
-	err := config.DB.Delete(&request).Error
+	// Cek apakah ada buku yang menggunakan kategori ini
+	var count int64
+	err := config.DB.Model(&models.Book{}).
+		Where("book_category_id = ?", request.ID).
+		Count(&count).Error
+	if err != nil {
+		return request, err
+	}
 
+	if count > 0 {
+		return request, fmt.Errorf("kategori tidak dapat dihapus karena sudah digunakan oleh %d buku", count)
+	}
+
+	err = config.DB.Delete(&request).Error
 	return request, err
 }
+
 
 func UpdateBookCategory(request models.BookCategory) (response models.BookCategory, err error) {
 	err = config.DB.Save(&request).Scan(&response).Error
