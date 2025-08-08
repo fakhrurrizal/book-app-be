@@ -21,9 +21,7 @@ func (request BookLendingRequest) Validate() error {
 	return validation.ValidateStruct(
 		&request,
 		validation.Field(&request.BookID, validation.Required),
-		validation.Field(&request.BorrowDate, validation.Required),
-		validation.Field(&request.DueDate, validation.Required),
-		validation.Field(&request.ReturnDate, validation.Required),
+		validation.Field(&request.UserID, validation.Required),
 		validation.Field(&request.Status, validation.Required),
 	)
 }
