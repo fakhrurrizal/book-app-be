@@ -47,6 +47,7 @@ type GlobalUserRequest struct {
 	Address      string `json:"address"`
 	Code         string `json:"code"`
 	Village      string `json:"village"`
+	IdAnggota    string `json:"id_anggota"`
 	District     string `json:"district"`
 	City         string `json:"city"`
 	Province     string `json:"province"`
@@ -82,6 +83,7 @@ type GlobalUserResponse struct {
 	Province              string               `json:"province"`
 	Country               string               `json:"country"`
 	ZipCode               string               `json:"zip_code"`
+	IdAnggota             string               `json:"id_anggota"`
 	Status                int                  `json:"status"`
 	Role                  GlobalIDNameResponse `json:"role"`
 	Department            GlobalIDNameResponse `json:"department"`

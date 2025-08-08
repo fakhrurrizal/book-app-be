@@ -13,6 +13,7 @@ import (
 
 	"github.com/guregu/null"
 	"github.com/lib/pq"
+	"gorm.io/gorm"
 )
 
 func CreateUser(status int, data *reqres.GlobalUserRequest, userID int) (response models.GlobalUser, err error) {
@@ -30,21 +31,22 @@ func CreateUser(status int, data *reqres.GlobalUserRequest, userID int) (respons
 		}
 
 		response = models.GlobalUser{
-			Avatar:   data.Avatar,
-			Fullname: data.Fullname,
-			Email:    strings.ToLower(data.Email),
-			Password: middlewares.BcryptPassword(data.Password),
-			Phone:    data.Phone,
-			Address:  data.Address,
-			Village:  data.Village,
-			District: data.District,
-			City:     data.City,
-			Province: data.Province,
-			Country:  data.Country,
-			ZipCode:  data.ZipCode,
-			Gender:   data.Gender,
-			RoleID:   data.RoleID,
-			Status:   status,
+			Avatar:    data.Avatar,
+			Fullname:  data.Fullname,
+			Email:     strings.ToLower(data.Email),
+			Password:  middlewares.BcryptPassword(data.Password),
+			Phone:     data.Phone,
+			Address:   data.Address,
+			IdAnggota: data.IdAnggota,
+			Village:   data.Village,
+			District:  data.District,
+			City:      data.City,
+			Province:  data.Province,
+			Country:   data.Country,
+			ZipCode:   data.ZipCode,
+			Gender:    data.Gender,
+			RoleID:    data.RoleID,
+			Status:    status,
 		}
 
 		response.EmailVerifiedAt = null.TimeFrom(time.Now().In(location))
@@ -73,6 +75,18 @@ func CreateUser(status int, data *reqres.GlobalUserRequest, userID int) (respons
 	return
 }
 
+func GetLastUserID() (int, error) {
+	var user models.GlobalUser
+	err := config.DB.Order("id DESC").First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return int(user.ID), nil
+}
+
 func BuildUserResponse(data models.GlobalUser) (response reqres.GlobalUserResponse) {
 
 	var roles models.GlobalRole
@@ -89,6 +103,7 @@ func BuildUserResponse(data models.GlobalUser) (response reqres.GlobalUserRespon
 	response.Province = data.Province
 	response.Country = data.Country
 	response.ZipCode = data.ZipCode
+	response.IdAnggota = data.IdAnggota
 	response.Status = data.Status
 	response.Gender = data.Gender
 

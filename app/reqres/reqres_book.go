@@ -15,6 +15,7 @@ type BookRequest struct {
 	BookCode        string `json:"book_code"`
 	Image           string `json:"image"`
 	PublicationYear int    `json:"publication_year"`
+	Stock           int    `json:"stock"`
 	Language        string `json:"language"`
 	Description     string `json:"description"`
 	NumberOfPages   int    `json:"number_of_pages"`
@@ -51,6 +52,7 @@ type BookResponse struct {
 	Publisher       string               `json:"publisher"`
 	Image           string               `json:"image"`
 	PublicationYear int                  `json:"publication_year"`
+	Stock           int                  `json:"stock"`
 	Language        string               `json:"language"`
 	Description     string               `json:"description"`
 	NumberOfPages   int                  `json:"number_of_pages"`

@@ -5,6 +5,7 @@ import (
 	"book-app/app/repository"
 	"book-app/app/reqres"
 	"book-app/app/utils"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -42,21 +43,29 @@ func SignUp(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.Respond(http.StatusBadRequest, "bad request", "email sudah terdaftar"))
 	}
 
+	today := time.Now().Format("20060102")
+	lastID, err := repository.GetLastUserID()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.Respond(http.StatusInternalServerError, "internal error", "gagal mengambil id terakhir"))
+	}
+	newID := fmt.Sprintf("%s%02d", today, lastID+1)
+
 	inputUser := reqres.GlobalUserRequest{
-		Fullname: request.Fullname,
-		Email:    request.Email,
-		Password: request.Password,
-		Phone:    request.Phone,
-		Address:  request.Address,
-		Gender:   request.Gender,
-		Avatar:   request.Avatar,
-		ZipCode:  request.ZipCode,
-		Village:  request.Village,
-		District: request.District,
-		City:     request.City,
-		Province: request.Province,
-		Country:  request.Country,
-		RoleID:   request.RoleID,
+		Fullname:  request.Fullname,
+		Email:     request.Email,
+		Password:  request.Password,
+		Phone:     request.Phone,
+		Address:   request.Address,
+		Gender:    request.Gender,
+		Avatar:    request.Avatar,
+		ZipCode:   request.ZipCode,
+		IdAnggota: newID,
+		Village:   request.Village,
+		District:  request.District,
+		City:      request.City,
+		Province:  request.Province,
+		Country:   request.Country,
+		RoleID:    request.RoleID,
 	}
 
 	_, err = repository.CreateUser(1, &inputUser, 0)

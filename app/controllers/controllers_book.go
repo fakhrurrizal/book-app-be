@@ -27,6 +27,7 @@ func CreateBook(c echo.Context) error {
 	input.Publisher = c.FormValue("publisher")
 	input.BookCode = c.FormValue("book_code")
 	input.PublicationYear, _ = strconv.Atoi(c.FormValue("publication_year"))
+	input.Stock, _ = strconv.Atoi(c.FormValue("stock"))
 	input.Language = c.FormValue("language")
 	input.Description = c.FormValue("description")
 	input.NumberOfPages, _ = strconv.Atoi(c.FormValue("number_of_pages"))
@@ -153,6 +154,7 @@ func UpdateBookByID(c echo.Context) error {
 	input.Publisher = c.FormValue("publisher")
 	input.BookCode = c.FormValue("book_code")
 	input.PublicationYear, _ = strconv.Atoi(c.FormValue("publication_year"))
+	input.Stock, _ = strconv.Atoi(c.FormValue("stock"))
 	input.Language = c.FormValue("language")
 	input.Description = c.FormValue("description")
 	input.NumberOfPages, _ = strconv.Atoi(c.FormValue("number_of_pages"))
@@ -205,6 +207,7 @@ func UpdateBookByID(c echo.Context) error {
 		data.PublicationYear = input.PublicationYear
 	}
 	data.Status = input.Status
+	data.Stock = input.Stock
 
 	// Save updated data to repository
 	dataUpdate, err := repository.UpdateBook(data)

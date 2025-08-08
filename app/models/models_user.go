@@ -12,6 +12,7 @@ type GlobalUser struct {
 	Avatar          string    `json:"avatar" gorm:"type: text"`
 	Fullname        string    `json:"fullname" gorm:"type: varchar(255)"`
 	Email           string    `json:"email" gorm:"type: varchar(255)"`
+	IdAnggota       string    `json:"id_anggota" gorm:"type: varchar(255)"`
 	Password        string    `json:"-" gorm:"type: varchar(255)"`
 	Phone           string    `json:"phone" gorm:"type: varchar(50)"`
 	Address         string    `json:"address" gorm:"type: varchar(255)"`

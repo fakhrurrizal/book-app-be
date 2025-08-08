@@ -6,6 +6,7 @@ type Book struct {
 	Author          string `json:"author" gorm:"type: varchar(255)"`
 	BookCode        string `json:"book_code" gorm:"type: varchar(20)"`
 	PublicationYear int    `json:"publication_year" gorm:"type:int"`
+	Stock           int    `json:"stock" gorm:"type:int"`
 	Language        string `json:"language" gorm:"type: varchar(50)"`
 	Publisher       string `json:"publisher" gorm:"type: varchar(50)"`
 	Description     string `json:"description" gorm:"type: text"`
