@@ -180,6 +180,7 @@ func GetSignInUser(c echo.Context) error {
 	data.ZipCode = user.ZipCode
 	data.Status = user.Status
 	data.Gender = user.Gender
+	data.IdAnggota = user.IdAnggota
 
 	if user.EmailVerifiedAt.Time.IsZero() {
 		data.EmailVerified = false
