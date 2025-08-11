@@ -5,7 +5,6 @@ import (
 	"book-app/app/reqres"
 	"book-app/app/utils"
 	"book-app/config"
-	"strconv"
 	"time"
 
 	"github.com/guregu/null"
@@ -44,9 +43,9 @@ func CreateBookLending(BorrowDate, DueDate, ReturnDate null.Time, data *reqres.B
 	return
 }
 
-func GetBookLendings(bookID, UserID int, param reqres.ReqPaging) (data reqres.ResPaging) {
+func GetBookLendings(bookID, userID int, param reqres.ReqPaging) (data reqres.ResPaging) {
 	var responses []models.BookLending
-	where := "deleted_at IS NULL"
+	where := "book_lendings.deleted_at IS NULL"
 
 	var modelTotal []models.BookLending
 
@@ -57,32 +56,48 @@ func GetBookLendings(bookID, UserID int, param reqres.ReqPaging) (data reqres.Re
 	var totalResult TotalResult
 	config.DB.Model(&modelTotal).Select("COUNT(*) AS total, MAX(updated_at) AS last_updated").Scan(&totalResult)
 
+	// Mulai query
+	query := config.DB.Table("book_lendings").
+		Joins("JOIN books ON books.id = book_lendings.book_id").
+		Joins("JOIN users ON users.id = book_lendings.user_id").
+		Where(where)
+
 	if param.Custom != "" {
-		where += " AND status = " + param.Custom.(string)
+		query = query.Where("book_lendings.status = ?", param.Custom)
 	}
-
 	if bookID > 0 {
-		where += " AND book_id = " + strconv.Itoa(bookID)
+		query = query.Where("book_lendings.book_id = ?", bookID)
 	}
 
-	if UserID > 0 {
-		where += " AND user_id = " + strconv.Itoa(UserID)
+	if userID > 0 {
+		query = query.Where("book_lendings.user_id = ?", userID)
 	}
 
+	if param.Search != "" {
+		search := "%" + param.Search + "%"
+		query = query.Where("books.title ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", search, search)
+	}
+
+	// Hitung total filtered
 	var totalFiltered int64
-	config.DB.Model(&modelTotal).Where(where).Count(&totalFiltered)
+	query.Count(&totalFiltered)
 
-	config.DB.Limit(param.Limit).Offset(param.Offset).Order(param.Sort + " " + param.Order).Where(where).Find(&responses)
+	// Ambil data dengan limit & offset
+	query.
+		Select("book_lendings.*"). // hanya ambil kolom dari tabel utama
+		Order(param.Sort + " " + param.Order).
+		Limit(param.Limit).
+		Offset(param.Offset).
+		Scan(&responses)
 
+	// Refining response
 	var responsesRefined []reqres.BookLendingResponse
 	for _, item := range responses {
 		responseRefined := BuildBookLendingResponse(item)
-
 		responsesRefined = append(responsesRefined, responseRefined)
 	}
 
 	data = utils.PopulateResPaging(&param, responsesRefined, totalResult.Total, totalFiltered)
-
 	return
 }
 
