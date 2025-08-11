@@ -75,22 +75,24 @@ func GetBookLendings(bookID, userID int, param reqres.ReqPaging) (data reqres.Re
 
 	if param.Search != "" {
 		search := "%" + param.Search + "%"
-		query = query.Where("books.title ILIKE ? OR global_users.fullname ILIKE ? OR global_users.email ILIKE ?", search, search)
+		query = query.Where(`
+        books.title ILIKE ? 
+        OR global_users.fullname ILIKE ? 
+        OR global_users.email ILIKE ?`,
+			search, search, search,
+		)
 	}
 
-	// Hitung total filtered
 	var totalFiltered int64
 	query.Count(&totalFiltered)
 
-	// Ambil data dengan limit & offset
 	query.
-		Select("book_lendings.*"). // hanya ambil kolom dari tabel utama
+		Select("book_lendings.*").
 		Order(param.Sort + " " + param.Order).
 		Limit(param.Limit).
 		Offset(param.Offset).
 		Scan(&responses)
 
-	// Refining response
 	var responsesRefined []reqres.BookLendingResponse
 	for _, item := range responses {
 		responseRefined := BuildBookLendingResponse(item)
