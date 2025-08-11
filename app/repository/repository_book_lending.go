@@ -75,7 +75,7 @@ func GetBookLendings(bookID, userID int, param reqres.ReqPaging) (data reqres.Re
 
 	if param.Search != "" {
 		search := "%" + param.Search + "%"
-		query = query.Where("books.title ILIKE ? OR global_users.name ILIKE ? OR global_users.email ILIKE ?", search, search)
+		query = query.Where("books.title ILIKE ? OR global_users.fullname ILIKE ? OR global_users.email ILIKE ?", search, search)
 	}
 
 	// Hitung total filtered
