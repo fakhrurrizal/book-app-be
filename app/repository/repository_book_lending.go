@@ -59,7 +59,7 @@ func GetBookLendings(bookID, userID int, param reqres.ReqPaging) (data reqres.Re
 	// Mulai query
 	query := config.DB.Table("book_lendings").
 		Joins("JOIN books ON books.id = book_lendings.book_id").
-		Joins("JOIN users ON users.id = book_lendings.user_id").
+		Joins("JOIN global_users ON global_users.id = book_lendings.user_id").
 		Where(where)
 
 	if param.Custom != "" {
@@ -75,7 +75,7 @@ func GetBookLendings(bookID, userID int, param reqres.ReqPaging) (data reqres.Re
 
 	if param.Search != "" {
 		search := "%" + param.Search + "%"
-		query = query.Where("books.title ILIKE ? OR users.name ILIKE ? OR users.email ILIKE ?", search, search)
+		query = query.Where("books.title ILIKE ? OR global_users.name ILIKE ? OR global_users.email ILIKE ?", search, search)
 	}
 
 	// Hitung total filtered
