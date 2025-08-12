@@ -80,7 +80,7 @@ func SignUp(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":  200,
-		"message": "Registration Successful",
+		"message": "Pendaftaran anda berhasil",
 	})
 
 }

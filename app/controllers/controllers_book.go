@@ -224,6 +224,6 @@ func UpdateBookByID(c echo.Context) error {
 	return c.JSON(200, map[string]interface{}{
 		"status":  200,
 		"data":    response,
-		"message": "Success to update",
+		"message": "Berhasil mengubah data buku",
 	})
 }

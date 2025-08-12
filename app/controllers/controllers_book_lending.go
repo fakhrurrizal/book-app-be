@@ -78,7 +78,7 @@ func CreateBookLending(c echo.Context) error {
 	return c.JSON(200, map[string]interface{}{
 		"status":  200,
 		"data":    data,
-		"message": "Create Success",
+		"message": "Berhasil membuat data peminjaman buku",
 	})
 }
 
@@ -155,7 +155,7 @@ func DeleteBookLendingByID(c echo.Context) error {
 	return c.JSON(200, map[string]interface{}{
 		"status":  200,
 		"data":    data,
-		"message": "Success to delete",
+		"message": "Berhasil menghapus data peminjaman buku",
 	})
 }
 
@@ -240,6 +240,6 @@ func UpdateBookLendingByID(c echo.Context) error {
 	return c.JSON(200, map[string]interface{}{
 		"status":  200,
 		"data":    dataUpdate,
-		"message": "Success to update",
+		"message": "Berhasil melakukan perubahan data",
 	})
 }
