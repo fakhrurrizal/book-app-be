@@ -150,6 +150,10 @@ func UpdateBookCategoryByID(c echo.Context) error {
 	if input.Name != "" {
 		data.Name = input.Name
 	}
+
+	if input.Name != "" {
+		data.Name = input.Name
+	}
 	if input.Description != "" {
 		data.Description = input.Description
 	}
