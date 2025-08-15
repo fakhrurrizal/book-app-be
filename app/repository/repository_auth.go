@@ -20,7 +20,7 @@ func SignIn(email, password string) (user models.GlobalUser, token string, err e
 
 	err = middlewares.VerifyPassword(password, user.Password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		err = errors.New("incorrect password")
+		err = errors.New("Password Salah")
 		return
 	}
 	if user.EmailVerifiedAt.IsZero() {
